@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE install PUBLIC "-//Joomla! 2.5//DTD template 1.0//EN" "http://www.joomla.org/xml/dtd/2.5/template-install.dtd">
+<extension version="3.0" type="template" client="site">
+	<name>jf_vihrea</name>
+	<version>1.0.0</version>
+	<creationDate>3/19/2013</creationDate>
+	<author>Kreatif Multimedia GmbH</author>
+	<authorEmail>info@joomfreak.com</authorEmail>
+	<authorUrl>http://www.joomfreak.com</authorUrl>
+	<copyright>Kreatif Multimedia GmbH</copyright>
+	<license>Attribution 2.5 Generic (CC BY 2.5)</license>
+	<description><![CDATA[<style type="text/css" media="all">
+<!--#container {padding:0 10px;}h2 {font-family: Arial Narrow,sans-serif;font-size:24px;margin:0; co-lor:#000;}--></style>
+<div id="container"><h2>jf_vihrea</h2><hr color="#E6E6E6" size="0">
+<p><i>joomfreak March 2013! Joomla 1.0.0 Template | Creative Commons | by joomfreak.com!</i></p><hr color="#E6E6E6" size="0">
+<p>License: <strong><a href="http://creativecommons.org/licenses/by/2.5/" target="_blank">Creative Commons, Attribution 2.5 Generic (CC BY 2.5)</a></strong></p><hr color="#E6E6E6" size="0">
+<p>jf_vihrea demo available here &raquo; <strong><a href="http://www.joomfreak.com/demo/" target="_blank">joomfreak Demo Server</a></strong></p><hr color="#E6E6E6" size="0">
+<p><a title="Visit our official website!" href="http://www.joomfreak.com" target="_blank">
+<img style="padding-left: 5px;" src="../templates/jf_vihrea/images/core/jf_vihrea.gif" border="0" alt="Logo" /></a></p>
+<img src="../templates/jf_vihrea/images/core/module_positions.jpg" border="0" alt="Module Positions" />
+</div>]]>
+	</description>
+	<files>
+		<filename>component.php</filename>
+		<filename>favicon.ico</filename>
+		<filename>index.php</filename>
+		<filename>template_preview.png</filename>
+		<filename>template_thumbnail.png</filename>
+		<filename>templateDetails.xml</filename>
+		<folder>css</folder>
+		<folder>fields</folder>
+		<folder>html</folder>
+		<folder>images</folder>
+		<folder>img</folder>
+		<folder>language</folder>
+		<folder>less</folder>
+		<folder>scripts</folder>
+	</files>
+	<positions>
+		<position>debug</position>
+		<position>position-0</position>
+		<position>position-1</position>
+		<position>position-2</position>
+		<position>position-3</position>
+		<position>position-4</position>
+		<position>position-5</position>
+		<position>position-6</position>
+		<position>position-7</position>
+		<position>position-8</position>
+		<position>position-9</position>
+		<position>position-10</position>
+		<position>position-11</position>
+		<position>position-12</position>
+		<position>social</position>
+		<position>mainmenu</position>
+		<position>fontsize</position>
+		<position>bottom</position>
+		<position>copyright</position>
+	</positions>
+	<languages folder="language">
+		<language tag="en-GB">en-GB/en-GB.tpl_jf_vihrea.ini</language>
+		<language tag="en-GB">en-GB/en-GB.tpl_jf_vihrea.sys.ini</language>
+	</languages>
+	<config>
+		<fields name="params">
+			<fieldset name="advanced"  addfieldpath="/templates/jf_vihrea/fields/">
+			
+				<field name="logoas" type="list" default=""
+					label="Logo"
+					description="Select an option">
+						<option value="1">Use as image</option>
+  						<option value="2">Use as text</option>
+				</field>
+
+				<field name="logoFile" class="" type="media" default=""
+					label="TPL_JF_VIHREA_LOGO_LABEL"
+					description="TPL_JF_VIHREA_LOGO_DESC" />
+					
+				<field name="sitetitle"  type="text" default=""
+					label="JGLOBAL_TITLE"
+					description="JFIELD_ALT_PAGE_TITLE_LABEL"
+					filter="string" />
+
+				<field name="fontresizer"
+					type="radio"
+					class="btn-group"
+					default="1"
+					label="TPL_JF_VIHREA_FONTRESIZER_LABEL"
+					description="TPL_JF_VIHREA_FONTRESIZER_DESC">
+						<option value="0">JNO</option>
+						<option value="1">JYES</option>
+				</field>
+				
+				<field name="social"
+					type="radio"
+					class="btn-group"
+					default="1"
+					label="Show Social Button"
+					description="Select an option">
+						<option value="0">JNO</option>
+						<option value="1">JYES</option>
+				</field>
+				
+				<field name="facebookicon" 
+					type="radio" 
+					class="btn-group"
+					default="1"
+					label="Show Facebook Icon"
+					description="Select an option">
+						<option value="0">JNO</option>
+  						<option value="1">JYES</option>
+				</field>
+				
+				<field name="facebooklink" type="text" default=""
+					label="Facebook Link"
+					description="Please add your facebook link here"
+					filter="string" />
+				
+				<field name="twittericon" 
+					type="radio"
+					class="btn-group"
+					default="1"
+					label="Show Twitter Icon"
+					description="Select an option">
+						<option value="0">JNO</option>
+  						<option value="1">JYES</option>
+				</field>
+				
+				<field name="twitterlink" type="text" default=""
+					label="Twitter Link"
+					description="Please add your twitter link here"
+					filter="string" />
+				
+				<field name="rssicon" 
+					type="radio" 
+					class="btn-group"
+					default="1"
+					label="Show RSS Icon"
+					description="Select an option">
+						<option value="0">JNO</option>
+  						<option value="1">JYES</option>
+				</field>
+				
+				<field name="rsslink" type="text" default=""
+					label="RSS Link"
+					description="Please add rss link here"
+					filter="string" />
+					
+				<field name="map" type="radio" default="1"
+					class="btn-group"
+					label="Use map in contact"
+					description="Select an option">
+						<option value="0">No</option>
+  						<option value="1">Yes</option>
+				</field>
+					
+				<field name="latitude" type="text" default="51.508742"
+					label="Latitude"
+					description="Latitude"
+					filter="string" />
+					
+				<field name="longitude" type="text" default="-0.120850"
+					label="Longitude"
+					description="Longitude"
+					filter="string" />
+					
+				<field name="marker" type="radio" default="1"
+					class="btn-group"
+					label="Publish this marker"
+					description="Select an option">
+						<option value="0">No</option>
+  						<option value="1">Yes</option>
+				</field>
+				
+				<field name="markerdescription" type="textarea" default=""
+					label="Description for marker"
+					description="Enter plain text for a description on the maker." 
+					rows="5" cols="30" filter="safehtml" />
+					
+				<field name="longlat" type="map" label="Google Map" description="" ></field>
+
+			</fieldset>
+		</fields>
+	</config>
+</extension>
