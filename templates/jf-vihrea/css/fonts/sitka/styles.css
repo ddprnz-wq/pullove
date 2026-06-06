@@ -1,0 +1,8 @@
+@font-face {
+  font-family: 'sitka-banner';
+  src: url(./sitka-banner.eot);
+  src: url(./sitka-banner.eot?#iefix) format('embedded-opentype'),
+       url(./sitka-banner.otf) format('otf'),
+       url(./sitka-banner.woff2) format('woff2'),
+       url(./sitka-banner.woff) format('woff');
+}

@@ -1,0 +1,154 @@
+@charset "utf-8";
+/* CSS Document */
+
+body {
+	margin: 0;
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+	font-size: 14px;
+	line-height: 18px;
+	color: #445055;
+	background-color: #f5f5f5;
+}
+
+.body .container {
+	padding: 10px;
+}
+
+ul,
+ol {
+	padding: 0;
+	margin: 0;
+	list-style: none;
+}
+
+/* HEADER */
+.header .header-inner {
+	padding: 10px;
+}
+
+.header .finder {
+	margin-top: 14px;
+}
+
+.site-title {
+	color: #000;
+	font-size: 60px;
+	line-height: 44px;
+	font-weight: bold;
+	text-transform: uppercase;
+}
+
+/* NAVIGATION */
+
+.navigation {
+	margin-bottom: 10px;
+}
+
+.navigation {
+	margin-bottom: 10px;
+}
+.navigation .navigation-inner {
+	padding: 10px;
+}
+
+.navigation .nav {
+	list-style: none;
+}
+
+.navigation .nav > li {
+	float: left;
+	position: relative;
+}
+
+.navigation .nav > li > a {
+	color: #5C686D;
+    font-family: amaranthregular;
+    font-size: 18px;
+    padding: 0 12px 0 0;
+    text-decoration: none;
+}
+
+.navigation .nav > li > a:hover, .navigation .nav > li.active > a {
+	color: #000;
+}
+
+/* BOTTOM */
+.bottom .bottom-inner {
+    background-color: #C1C4C5;
+    padding: 10px;
+}
+
+.bottom .jf-moduletable {
+    background: none repeat scroll 0 0 transparent;
+    float: left;
+    width: 20%;
+}
+
+.bottom .jf-moduletable .jf-box {
+    margin: 10px;
+    padding: 50px 38px;
+}
+
+.bottom #Mod95 .jf-box {
+	background-color: #2a363b;
+}
+
+.bottom #Mod96 .jf-box {
+	background-color: #445055;
+}
+
+.bottom #Mod97 .jf-box {
+	background-color: #5c686d;
+}
+
+.bottom #Mod98 .jf-box {
+	background-color: #778186;
+}
+
+.bottom .jf-moduletable h3 {
+	color: #fff;
+	font-family: amaranthregular;
+	font-size: 24px;
+	font-weight: normal;
+	margin: 0 0 15px 0;
+}
+
+.bottom .jf-moduletable ul li {
+	background: url(../images/arrow1.png) no-repeat left center;
+	padding-left: 10px;
+}
+
+.bottom .jf-moduletable a {
+	color: #fff;
+	line-height: 160%;
+}
+
+.bottom #Mod28 h3, .bottom #Mod28 a {
+	color: #000;
+}
+
+.bottom #Mod28 ul li {
+	background: url(../images/arrow2.png) no-repeat left center;
+}
+
+/* FOOTER */
+.footer-inner {
+	padding: 20px;
+}
+
+.copyright {
+	float: left;
+}
+
+.footer p {
+	margin: 0;
+}
+
+#back-top {
+    background: url("../images/backtop.png") no-repeat scroll 0 0 transparent;
+    cursor: pointer;
+    float: right;
+    height: 10px;
+    width: 11px;
+	text-indent: -9999em;
+}
