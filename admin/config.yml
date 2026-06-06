@@ -1,0 +1,17 @@
+backend:
+  name: git-gateway
+  branch: main # Sostituisci con "master" se il tuo ramo principale si chiama così
+
+media_folder: "images/uploads"
+public_folder: "/images/uploads"
+
+collections:
+  - name: "prodotti"
+    label: "Prodotti Amazon"
+    folder: "dati/prodotti"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Titolo Maglione", name: "title", widget: "string" }
+      - { label: "Link Affiliazione Amazon", name: "link_amazon", widget: "string" }
+      - { label: "Prezzo (€)", name: "prezzo", widget: "string" }
