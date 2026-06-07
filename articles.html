@@ -323,6 +323,8 @@ fetch("https://raw.githubusercontent.com/ddprnz-wq/pullove/main/content/posts/in
 
     const container = document.getElementById("posts");
 
+    let html = "";
+
     files.forEach(file => {
 
       fetch(`https://raw.githubusercontent.com/ddprnz-wq/pullove/main/content/posts/${file}`)
@@ -346,7 +348,7 @@ fetch("https://raw.githubusercontent.com/ddprnz-wq/pullove/main/content/posts/in
             });
           }
 
-          container.innerHTML += `
+          html += `
             <article style="margin-bottom:40px;padding:20px;border:1px solid #ccc;border-radius:10px;">
               <h2>${meta.title || "Untitled"}</h2>
               <small>${meta.date || ""}</small>
@@ -354,6 +356,9 @@ fetch("https://raw.githubusercontent.com/ddprnz-wq/pullove/main/content/posts/in
               <div>${marked.parse(content)}</div>
             </article>
           `;
+
+          container.innerHTML = html;
+
         });
 
     });
