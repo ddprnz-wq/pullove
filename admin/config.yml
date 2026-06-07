@@ -1,17 +1,44 @@
+# Use DecapBridge PKCE auth (required)
 backend:
-  name: git-gateway
-  branch: main # Sostituisci con "master" se il tuo ramo principale si chiama così
+  name: github
+  repo: ddprnz-wq/pullove
+  branch: main
+  auth_type: pkce
+  base_url: https://auth.decapbridge.com
+  auth_endpoint: /sites/defa2633-0ee3-4df3-bebc-baeaee48f52c/pkce
+  auth_token_endpoint: /sites/defa2633-0ee3-4df3-bebc-baeaee48f52c/token
+  gateway_url: https://gateway.decapbridge.com
 
+  commit_messages:
+    create: Create {{collection}} “{{slug}}” - {{author-name}} <{{author-login}}> via DecapBridge
+    update: Update {{collection}} “{{slug}}” - {{author-name}} <{{author-login}}> via DecapBridge
+    delete: Delete {{collection}} “{{slug}}” - {{author-name}} <{{author-login}}> via DecapBridge
+    uploadMedia: Upload “{{path}}” - {{author-name}} <{{author-login}}> via DecapBridge
+    deleteMedia: Delete “{{path}}” - {{author-name}} <{{author-login}}> via DecapBridge
+    openAuthoring: Message {{message}} - {{author-name}} <{{author-login}}> via DecapBridge
+
+auth:
+  email_claim: email
+  first_name_claim: first_name
+  last_name_claim: last_name
+  avatar_url_claim: avatar_url
+
+logo_url: https://decapbridge.com/decapcms-with-bridge.svg
+site_url: https://pullove.com
+
+# Dove salvare le immagini
 media_folder: "images/uploads"
 public_folder: "/images/uploads"
 
+# Definizione dei contenuti gestiti dal CMS
 collections:
-  - name: "prodotti"
-    label: "Prodotti Amazon"
-    folder: "dati/prodotti"
+  - name: "posts"
+    label: "Articles"
+    folder: "content/posts"
     create: true
     slug: "{{slug}}"
     fields:
-      - { label: "Titolo Maglione", name: "title", widget: "string" }
-      - { label: "Link Affiliazione Amazon", name: "link_amazon", widget: "string" }
-      - { label: "Prezzo (€)", name: "prezzo", widget: "string" }
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Date", name: "date", widget: "datetime" }
+      - { label: "Featured Image", name: "thumbnail", widget: "image", required: false }
+      - { label: "Body", name: "body", widget: "markdown" }
