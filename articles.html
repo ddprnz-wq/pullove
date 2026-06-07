@@ -323,15 +323,47 @@ const posts = [
 
 posts.forEach(file => {
 
-  fetch(`https://raw.githubusercontent.com/ddprnz-wq/pullove/main/content/posts/${file}`)
-    .then(r => r.text())
-    .then(md => {
-      document.getElementById("posts").innerHTML += `
-        <article style="margin-bottom:40px;padding:20px;border:1px solid #ccc;border-radius:10px;">
-          ${marked.parse(md)}
-        </article>
-      `;
-    });
+fetch("https://raw.githubusercontent.com/ddprnz-wq/pullove/main/content/posts/prova1.md")
+  .then(r => r.text())
+  .then(md => {
+
+    // separa front matter e contenuto
+    const parts = md.split("---");
+
+    let meta = {};
+    let content = md;
+
+    if (parts.length >= 3) {
+
+      const yaml = parts[1].trim();
+      content = parts.slice(2).join("---");
+
+      // parsing semplice YAML (senza librerie)
+      yaml.split("\n").forEach(line => {
+        const [key, ...rest] = line.split(":");
+        if (key && rest.length) {
+          meta[key.trim()] = rest.join(":").trim();
+        }
+      });
+    }
+
+    // costruzione HTML finale
+    document.getElementById("posts").innerHTML = `
+      <article>
+
+        <h1>${meta.title || "Untitled"}</h1>
+
+        ${meta.date ? `<small>${meta.date}</small>` : ""}
+
+        ${meta.thumbnail ? `<img src="${meta.thumbnail}" style="max-width:100%">` : ""}
+
+        <div>
+          ${marked.parse(content)}
+        </div>
+
+      </article>
+    `;
+  });
 
 });
 </script>
