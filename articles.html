@@ -314,40 +314,15 @@
 
             <div id="posts"></div>
 
-                <script>
-                $(function () {
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
-    const repo = "ddprnz-wq/pullove";
-    const folder = "content/posts";
-
-    $.getJSON(`https://api.github.com/repos/${repo}/contents/${folder}`, function(files) {
-
-        console.log("FILES:", files);
-
-        files.forEach(file => {
-
-            if (file.name.endsWith(".md")) {
-
-                $.get(file.download_url, function(md) {
-
-                    const html = marked.parse(md);
-
-                    $("#posts").append(`
-                        <article style="margin-bottom:40px;padding:20px;border:1px solid #ccc;border-radius:10px;">
-                            ${html}
-                        </article>
-                    `);
-
-                });
-
-            }
-
-        });
-
-    });
-
-});
-                </script>
+<script>
+fetch("https://raw.githubusercontent.com/ddprnz-wq/pullove/main/content/posts/prova1.md")
+  .then(r => r.text())
+  .then(md => {
+    document.getElementById("posts").innerHTML = marked.parse(md);
+  });
+</script>
     		Provina
         </div>
     </div>
