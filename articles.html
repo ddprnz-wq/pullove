@@ -317,11 +317,23 @@
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
 <script>
-fetch("https://raw.githubusercontent.com/ddprnz-wq/pullove/main/content/posts/prova1.md")
-  .then(r => r.text())
-  .then(md => {
-    document.getElementById("posts").innerHTML = marked.parse(md);
-  });
+const posts = [
+  "prova1.md"
+];
+
+posts.forEach(file => {
+
+  fetch(`https://raw.githubusercontent.com/ddprnz-wq/pullove/main/content/posts/${file}`)
+    .then(r => r.text())
+    .then(md => {
+      document.getElementById("posts").innerHTML += `
+        <article style="margin-bottom:40px;padding:20px;border:1px solid #ccc;border-radius:10px;">
+          ${marked.parse(md)}
+        </article>
+      `;
+    });
+
+});
 </script>
     		Provina
         </div>
