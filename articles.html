@@ -311,8 +311,7 @@
     <!-- Bottom -->
     <div class="bottom">
     	<div class="bottom-inner clearfix">
-
-            <div id="posts"></div>
+<div id="posts"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
@@ -321,13 +320,10 @@ fetch("https://raw.githubusercontent.com/ddprnz-wq/pullove/main/content/posts/in
   .then(r => r.json())
   .then(files => {
 
-    const container = document.getElementById("posts");
+    const base = "https://raw.githubusercontent.com/ddprnz-wq/pullove/main/content/posts/";
 
-    let html = "";
-
-    files.forEach(file => {
-
-      fetch(`https://raw.githubusercontent.com/ddprnz-wq/pullove/main/content/posts/${file}`)
+    const promises = files.map(file =>
+      fetch(base + file)
         .then(r => r.text())
         .then(md => {
 
@@ -348,18 +344,42 @@ fetch("https://raw.githubusercontent.com/ddprnz-wq/pullove/main/content/posts/in
             });
           }
 
-          html += `
-            <article style="margin-bottom:40px;padding:20px;border:1px solid #ccc;border-radius:10px;">
-              <h2>${meta.title || "Untitled"}</h2>
-              <small>${meta.date || ""}</small>
-              ${meta.thumbnail ? `<img src="${meta.thumbnail}" style="max-width:100%">` : ""}
-              <div>${marked.parse(content)}</div>
-            </article>
-          `;
+          return {
+            meta,
+            content
+          };
+        })
+    );
 
-          container.innerHTML = html;
+    Promise.all(promises).then(posts => {
 
-        });
+      // ordine per data (opzionale ma consigliato)
+      posts.sort((a, b) => new Date(b.meta.date) - new Date(a.meta.date));
+
+      const html = posts.map(post => `
+        <article style="
+          margin-bottom:40px;
+          padding:20px;
+          border:1px solid #ccc;
+          border-radius:10px;
+        ">
+          <h2>${post.meta.title || "Untitled"}</h2>
+
+          <small style="color:#666;">
+            ${post.meta.date ? new Date(post.meta.date).toLocaleDateString() : ""}
+          </small>
+
+          ${post.meta.thumbnail ? `
+            <img src="${post.meta.thumbnail}" style="max-width:100%; margin-top:10px;">
+          ` : ""}
+
+          <div style="margin-top:15px;">
+            ${marked.parse(post.content)}
+          </div>
+        </article>
+      `).join("");
+
+      document.getElementById("posts").innerHTML = html;
 
     });
 
