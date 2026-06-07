@@ -318,34 +318,44 @@
                 <script>
                 $(document).ready(function () {
 
-                const repo = "ddprnz-wq/pullove";
-                const folder = "posts";
+    const repo = "ddprnz-wq/pullove";
+    const folder = "posts";
 
-                $.getJSON(`https://api.github.com/repos/${repo}/contents/${folder}`, function(files) {
+    console.log("Inizio caricamento");
 
-                    files.forEach(file => {
+    $.getJSON(`https://api.github.com/repos/${repo}/contents/${folder}`, function(files) {
 
-                    if (file.name.endsWith(".md")) {
+        console.log("File trovati:", files);
 
-                        $.get(file.download_url, function(md) {
+        files.forEach(file => {
 
-                        const html = marked.parse(md);
+            console.log("Controllo:", file.name);
 
-                        $("#posts").append(`
-                            <article style="margin-bottom:40px;padding:20px;border:1px solid #ccc;border-radius:10px;">
+            if (file.name.endsWith(".md")) {
+
+                $.get(file.download_url, function(md) {
+
+                    console.log("Markdown:", md);
+
+                    const html = marked.parse(md);
+
+                    $("#posts").append(`
+                        <article style="margin-bottom:40px;padding:20px;border:1px solid #ccc;border-radius:10px;">
                             ${html}
-                            </article>
-                        `);
-
-                        });
-
-                    }
-
-                    });
+                        </article>
+                    `);
 
                 });
 
-                });
+            }
+
+        });
+
+    }).fail(function(jqXHR, textStatus, errorThrown) {
+        console.error("Errore GitHub:", textStatus, errorThrown);
+    });
+
+});
                 </script>
     		Provina
         </div>
