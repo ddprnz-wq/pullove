@@ -24,7 +24,7 @@ auth:
   avatar_url_claim: avatar_url
 
 logo_url: https://decapbridge.com/decapcms-with-bridge.svg
-site_url: https://pullove.com
+site_url: https://pullove.pages.dev/
 
 # Dove salvare le immagini
 media_folder: "images/uploads"
