@@ -316,72 +316,54 @@
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
 <script>
-fetch("https://raw.githubusercontent.com/ddprnz-wq/pullove/main/content/posts/index.json")
+fetch("https://api.github.com/repos/ddprnz-wq/pullove/contents/content/posts")
   .then(r => r.json())
   .then(files => {
 
-    const base = "https://raw.githubusercontent.com/ddprnz-wq/pullove/main/content/posts/";
+    const posts = files
+      .filter(f => f.name.endsWith(".md"))
+      .map(f => f.download_url);
 
-    const promises = files.map(file =>
-      fetch(base + file)
-        .then(r => r.text())
-        .then(md => {
+    return Promise.all(
+      posts.map(url =>
+        fetch(url)
+          .then(r => r.text())
+          .then(md => {
 
-          const parts = md.split("---");
+            const parts = md.split("---");
 
-          let meta = {};
-          let content = md;
+            let meta = {};
+            let content = md;
 
-          if (parts.length >= 3) {
-            const yaml = parts[1].trim();
-            content = parts.slice(2).join("---");
+            if (parts.length >= 3) {
+              const yaml = parts[1].trim();
+              content = parts.slice(2).join("---");
 
-            yaml.split("\n").forEach(line => {
-              const [k, ...v] = line.split(":");
-              if (k && v.length) {
-                meta[k.trim()] = v.join(":").trim();
-              }
-            });
-          }
+              yaml.split("\n").forEach(line => {
+                const [k, ...v] = line.split(":");
+                if (k && v.length) {
+                  meta[k.trim()] = v.join(":").trim();
+                }
+              });
+            }
 
-          return {
-            meta,
-            content
-          };
-        })
+            return { meta, content };
+          })
+      )
     );
+  })
+  .then(posts => {
 
-    Promise.all(promises).then(posts => {
+    posts.sort((a, b) => new Date(b.meta.date) - new Date(a.meta.date));
 
-      // ordine per data (opzionale ma consigliato)
-      posts.sort((a, b) => new Date(b.meta.date) - new Date(a.meta.date));
-
-      const html = posts.map(post => `
-        <article style="
-          margin-bottom:40px;
-          padding:20px;
-          border:1px solid #ccc;
-          border-radius:10px;
-        ">
-          <h2>${post.meta.title || "Untitled"}</h2>
-
-          <small style="color:#666;">
-            ${post.meta.date ? new Date(post.meta.date).toLocaleDateString() : ""}
-          </small>
-
-          ${post.meta.thumbnail ? `
-            <img src="${post.meta.thumbnail}" style="max-width:100%; margin-top:10px;">
-          ` : ""}
-
-          <div style="margin-top:15px;">
-            ${marked.parse(post.content)}
-          </div>
-        </article>
-      `).join("");
-
-      document.getElementById("posts").innerHTML = html;
-
-    });
+    document.getElementById("posts").innerHTML = posts.map(p => `
+      <article style="margin-bottom:40px;padding:20px;border:1px solid #ccc;border-radius:10px;">
+        <h2>${p.meta.title || "Untitled"}</h2>
+        <small>${p.meta.date || ""}</small>
+        ${p.meta.thumbnail ? `<img src="${p.meta.thumbnail}" style="max-width:100%">` : ""}
+        <div>${marked.parse(p.content)}</div>
+      </article>
+    `).join("");
 
   });
 </script>
