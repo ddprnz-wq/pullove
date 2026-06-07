@@ -317,10 +317,7 @@
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
 <script>
-const repo = "ddprnz-wq/pullove";
-const folder = "content/posts";
-
-fetch(`https://api.github.com/repos/${repo}/contents/${folder}`)
+fetch("https://raw.githubusercontent.com/ddprnz-wq/pullove/main/content/posts/index.json")
   .then(r => r.json())
   .then(files => {
 
@@ -328,9 +325,7 @@ fetch(`https://api.github.com/repos/${repo}/contents/${folder}`)
 
     files.forEach(file => {
 
-      if (!file.name.endsWith(".md")) return;
-
-      fetch(file.download_url)
+      fetch(`https://raw.githubusercontent.com/ddprnz-wq/pullove/main/content/posts/${file}`)
         .then(r => r.text())
         .then(md => {
 
@@ -353,13 +348,14 @@ fetch(`https://api.github.com/repos/${repo}/contents/${folder}`)
 
           container.innerHTML += `
             <article style="margin-bottom:40px;padding:20px;border:1px solid #ccc;border-radius:10px;">
-              <h2>${meta.title || "No title"}</h2>
+              <h2>${meta.title || "Untitled"}</h2>
               <small>${meta.date || ""}</small>
               ${meta.thumbnail ? `<img src="${meta.thumbnail}" style="max-width:100%">` : ""}
               <div>${marked.parse(content)}</div>
             </article>
           `;
         });
+
     });
 
   });
