@@ -315,26 +315,20 @@
             <div id="posts"></div>
 
                 <script>
-                $(document).ready(function () {
+                $(function () {
 
     const repo = "ddprnz-wq/pullove";
-    const folder = "posts";
+    const folder = "content/posts";
 
-    console.log("Inizio caricamento");
+    $.getJSON(`https://api.github.com/repos/${repo}/contents/${folder}`, function(files) {
 
-    $.getJSON(`https://api.github.com/repos/${repo}/content/${folder}`, function(files) {
-
-        console.log("File trovati:", files);
+        console.log("FILES:", files);
 
         files.forEach(file => {
-
-            console.log("Controllo:", file.name);
 
             if (file.name.endsWith(".md")) {
 
                 $.get(file.download_url, function(md) {
-
-                    console.log("Markdown:", md);
 
                     const html = marked.parse(md);
 
@@ -350,8 +344,6 @@
 
         });
 
-    }).fail(function(jqXHR, textStatus, errorThrown) {
-        console.error("Errore GitHub:", textStatus, errorThrown);
     });
 
 });
