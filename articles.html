@@ -317,55 +317,52 @@
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
 <script>
-const posts = [
-  "prova1.md"
-];
+const repo = "ddprnz-wq/pullove";
+const folder = "content/posts";
 
-posts.forEach(file => {
+fetch(`https://api.github.com/repos/${repo}/contents/${folder}`)
+  .then(r => r.json())
+  .then(files => {
 
-fetch("https://raw.githubusercontent.com/ddprnz-wq/pullove/main/content/posts/")
-  .then(r => r.text())
-  .then(md => {
+    const container = document.getElementById("posts");
 
-    // separa front matter e contenuto
-    const parts = md.split("---");
+    files.forEach(file => {
 
-    let meta = {};
-    let content = md;
+      if (!file.name.endsWith(".md")) return;
 
-    if (parts.length >= 3) {
+      fetch(file.download_url)
+        .then(r => r.text())
+        .then(md => {
 
-      const yaml = parts[1].trim();
-      content = parts.slice(2).join("---");
+          const parts = md.split("---");
 
-      // parsing semplice YAML (senza librerie)
-      yaml.split("\n").forEach(line => {
-        const [key, ...rest] = line.split(":");
-        if (key && rest.length) {
-          meta[key.trim()] = rest.join(":").trim();
-        }
-      });
-    }
+          let meta = {};
+          let content = md;
 
-    // costruzione HTML finale
-    document.getElementById("posts").innerHTML = `
-      <article>
+          if (parts.length >= 3) {
+            const yaml = parts[1].trim();
+            content = parts.slice(2).join("---");
 
-        <h1>${meta.title || "Untitled"}</h1>
+            yaml.split("\n").forEach(line => {
+              const [k, ...v] = line.split(":");
+              if (k && v.length) {
+                meta[k.trim()] = v.join(":").trim();
+              }
+            });
+          }
 
-        ${meta.date ? `<small>${meta.date}</small>` : ""}
+          container.innerHTML += `
+            <article style="margin-bottom:40px;padding:20px;border:1px solid #ccc;border-radius:10px;">
+              <h2>${meta.title || "No title"}</h2>
+              <small>${meta.date || ""}</small>
+              ${meta.thumbnail ? `<img src="${meta.thumbnail}" style="max-width:100%">` : ""}
+              <div>${marked.parse(content)}</div>
+            </article>
+          `;
+        });
+    });
 
-        ${meta.thumbnail ? `<img src="${meta.thumbnail}" style="max-width:100%">` : ""}
-
-        <div>
-          ${marked.parse(content)}
-        </div>
-
-      </article>
-    `;
   });
-
-});
 </script>
     		Provina
         </div>
