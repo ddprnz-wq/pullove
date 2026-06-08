@@ -5,4 +5,5 @@ thumbnail: ""
 ---
 Vediamo la prova 2. Provina provetta.
 
-![](/images/uploads/px-isabellamariana.jpg)
+
+<img src="/images/uploads/px-isabellamariana.jpg" alt="Immagine Responsive" style="width: 100px; height: auto;">
