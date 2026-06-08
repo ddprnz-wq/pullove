@@ -81,30 +81,29 @@
             const response = await fetch(nomeFile);
             
             if (response.ok) {
+    const codiceHtml = await response.text();
+
+    // CONTROLLO DI SICUREZZA PER GITHUB/CLOUDFLARE:
+    // Se il server "imbroglia" e ti sta ridando la pagina index.html principale,
+    // significa che il file numerato reale è finito. 
+                if (codiceHtml.includes('id="lista-file-container"')) {
+                    console.log("Rilevato reindirizzamento alla pagina principale. Stop.");
+                    continua = false; 
+                    break; // Esce immediatamente dal ciclo while
+                }
+
                 fileTrovati++;
                 
-                // 1. Legge il contenuto testuale del file HTML appena scaricato
-                const codiceHtml = await response.text();
+                // ... tutto il resto del tuo codice per DOMParser e pesoKB rimane identico ...
+                const byteSize = new Blob([codiceHtml]).size;
+                const pesoKB = (byteSize / 1024).toFixed(2) + " kB";
                 
-                // 2. Crea un documento virtuale in memoria per analizzarlo come vero HTML
                 const parser = new DOMParser();
                 const documentoVirtuale = parser.parseFromString(codiceHtml, 'text/html');
+                const titoloFile = documentoVirtuale.querySelector('title')?.textContent || "Nessun titolo";
                 
-                // 3. Estrae il testo del tag <title> (se non esiste, usa un testo di riserva)
-                const titoloFile = documentoVirtuale.querySelector('title')?.textContent || "Nessun titolo definito";
-                
-                // 4. Crea l'elemento nella pagina mostrando sia il link che il titolo estratto
-                const elemento = document.createElement('div');
-                elemento.className = 'file-item';
-                
-                elemento.innerHTML = `
-                    <strong>File ${fileTrovati}:</strong> 
-                    <a href="${nomeFile}" target="_blank">${nomeFile}</a> 
-                    <span style="color: #555; margin-left: 10px;"> - Titolo: "<em>${titoloFile}</em>"</span>
-                `;
-                
-                container.appendChild(elemento);
-                indice++; 
+                // ... inserimento nell'HTML ...
+                indice++;
             } else {
                 continua = false;
             }
