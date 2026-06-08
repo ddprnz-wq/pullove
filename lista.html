@@ -11,7 +11,7 @@
 </head>
 <body>
 
-    <h1>Articoli trovati nella cartella articles/:</h1>
+    <h1>Articoli trovati nella cartella /articles/:</h1>
     <div id="lista-file-container">Caricamento in corso...</div>
 
     <script>
@@ -19,54 +19,46 @@
         const container = document.getElementById('lista-file-container');
         container.innerHTML = ''; 
         
-        let lunghezzaIndex = 0;
-        
-        // 1. Scarica la index principale dal percorso assoluto per calcolare l'anti-loop
-        try {
-            const resIndex = await fetch('/index.html');
-            if (resIndex.ok) {
-                const testoIndex = await resIndex.text();
-                lunghezzaIndex = testoIndex.length;
-            }
-        } catch (e) {
-            console.log("Impossibile verificare index.html");
-        }
-        
         let indice = 1;
         let continua = true;
         let fileTrovati = 0;
-        const LIMITE_MASSIMO = 10; 
+        const LIMITE_MASSIMO = 50; // Limite di sicurezza
 
         while (continua && indice <= LIMITE_MASSIMO) {
-            // Costruisce il percorso corretto verso la sottocartella articles
+            // Percorso verso la sottocartella degli articoli
             const nomeFile = `art${indice}.html`;
-            const percorsoFile = `articles/${nomeFile}`; 
+            const percorsoFile = `/articles/${nomeFile}`; 
             
             try {
-                const response = await fetch(percorsoFile);
+                // Aggiungiamo un parametro casuale per bypassare la cache di Cloudflare (?nocache=...)
+                const response = await fetch(`${percorsoFile}?nocache=${Date.now()}`);
                 
                 if (response.ok) {
                     const codiceHtml = await response.text();
 
-                    // CONTROLLO ANTI-LOOP DI CLOUDFLARE
-                    if (codiceHtml.length === lunghezzaIndex) {
-                        console.log("Rilevato reindirzzamento falso alla homepage. Fine file.");
+                    // CONTROLLO DI SICUREZZA ANTI-LOOP BASATO SUL CONTENUTO:
+                    // Se Cloudflare ci rifila la homepage index.html di nascosto, questa conterrà sicuramente 
+                    // dei tag o degli id che l'articolo vero NON ha (es. il link a lista.html).
+                    if (codiceHtml.includes('lista.html') || codiceHtml.includes('id="lista-file-container"')) {
+                        console.log(`Trovato codice della homepage su ${nomeFile}. Stop ciclo.`);
                         continua = false; 
                         break; 
                     }
 
                     fileTrovati++;
                     
+                    // Calcolo del peso in kB
                     const byteSize = new Blob([codiceHtml]).size;
                     const pesoKB = (byteSize / 1024).toFixed(2) + " kB";
                     
+                    // Estrazione del titolo dell'articolo
                     const parser = new DOMParser();
                     const documentoVirtuale = parser.parseFromString(codiceHtml, 'text/html');
                     const titoloFile = documentoVirtuale.querySelector('title')?.textContent || "Nessun titolo";
                     
+                    // Genera la riga nella pagina lista.html
                     const elemento = document.createElement('div');
                     elemento.className = 'file-item';
-                    // Nota: href punta a percorsoFile così i link si aprono correttamente
                     elemento.innerHTML = `
                         <strong>Articolo ${fileTrovati}:</strong> 
                         <a href="${percorsoFile}" target="_blank">${nomeFile}</a> 
@@ -80,13 +72,13 @@
                     continua = false; 
                 }
             } catch (errore) {
-                console.error("Errore:", errore);
+                console.error("Errore di rete:", errore);
                 continua = false;
             }
         }
 
         if (fileTrovati === 0) {
-            container.innerHTML = '<p class="error-msg">Nessun articolo trovato nella cartella /articles/.</p>';
+            container.innerHTML = '<p class="error-msg">Nessun articolo trovato nella cartella /articles/. Controlla che i file siano scritti in minuscolo (es. art1.html).</p>';
         }
     }
 
