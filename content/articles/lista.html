@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista File della Cartella Web</title>
+    <style>
+        body { font-family: sans-serif; margin: 20px; }
+        .file-item { padding: 8px; border-bottom: 1px solid #ccc; }
+        .error-msg { color: gray; font-style: italic; }
+    </style>
+</head>
+<body>
+
+    <h1>File trovati nella cartella:</h1>
+    
+    <!-- Contenitore in cui verranno mostrati i file -->
+    <div id="lista-file-container">Caricamento in corso...</div>
+
+    <script>
+    async function mostraListaFile() {
+        const container = document.getElementById('lista-file-container');
+        container.innerHTML = ''; // Svuota il testo di caricamento
+        
+        let indice = 1;
+        let continua = true;
+        let fileTrovati = 0;
+
+        // Ciclo sequenziale per cercare file1, file2, file3...
+        while (continua) {
+            // Modifica l'estensione (.txt, .html, .jpg) in base alle tue necessità
+            const nomeFile = `art${indice}.html`; 
+            
+            try {
+                // Esegue la richiesta web per verificare l'esistenza del file
+                const response = await fetch(nomeFile);
+                
+                if (response.ok) {
+                    fileTrovati++;
+                    
+                    // Crea un elemento HTML per mostrare il file nella lista
+                    const elemento = document.createElement('div');
+                    elemento.className = 'file-item';
+                    elemento.innerHTML = `<strong>File ${fileTrovati}:</strong> <a href="${nomeFile}" target="_blank">${nomeFile}</a>`;
+                    
+                    // Aggiunge l'elemento alla pagina
+                    container.appendChild(elemento);
+                    
+                    indice++; // Passa al file successivo
+                } else {
+                    // Ferma il ciclo se riceve un errore (es. 404 File Not Found)
+                    continua = false;
+                }
+            } catch (errore) {
+                console.error("Errore di rete:", errore);
+                continua = false;
+            }
+        }
+
+        // Se non viene trovato nemmeno il primo file
+        if (fileTrovati === 0) {
+            container.innerHTML = '<p class="error-msg">Nessun file trovato con questo schema di nomi.</p>';
+        }
+    }
+
+    // Avvia la scansione all'apertura della pagina
+
+    //////////////////////////////////
+    
+    async function mostraListaFile2() {
+    const container = document.getElementById('lista-file-container');
+    container.innerHTML = ''; 
+    
+    let indice = 1;
+    let continua = true;
+    let fileTrovati = 0;
+
+    while (continua) {
+        const nomeFile = `art${indice}.html`; 
+        
+        try {
+            const response = await fetch(nomeFile);
+            
+            if (response.ok) {
+                fileTrovati++;
+                
+                // 1. Legge il contenuto testuale del file HTML appena scaricato
+                const codiceHtml = await response.text();
+                
+                // 2. Crea un documento virtuale in memoria per analizzarlo come vero HTML
+                const parser = new DOMParser();
+                const documentoVirtuale = parser.parseFromString(codiceHtml, 'text/html');
+                
+                // 3. Estrae il testo del tag <title> (se non esiste, usa un testo di riserva)
+                const titoloFile = documentoVirtuale.querySelector('title')?.textContent || "Nessun titolo definito";
+                
+                // 4. Crea l'elemento nella pagina mostrando sia il link che il titolo estratto
+                const elemento = document.createElement('div');
+                elemento.className = 'file-item';
+                
+                elemento.innerHTML = `
+                    <strong>File ${fileTrovati}:</strong> 
+                    <a href="${nomeFile}" target="_blank">${nomeFile}</a> 
+                    <span style="color: #555; margin-left: 10px;"> - Titolo: "<em>${titoloFile}</em>"</span>
+                `;
+                
+                container.appendChild(elemento);
+                indice++; 
+            } else {
+                continua = false;
+            }
+        } catch (errore) {
+            console.error("Errore di rete durante la lettura:", errore);
+            continua = false;
+        }
+    }
+
+    if (fileTrovati === 0) {
+        container.innerHTML = '<p class="error-msg">Nessun file trovato.</p>';
+    }
+}
+    mostraListaFile2();
+    </script>
+
+</body>
+</html>
