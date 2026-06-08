@@ -38,7 +38,7 @@
         const LIMITE_MASSIMO = 10; // Sicurezza estrema
 
         while (continua && indice <= LIMITE_MASSIMO) {
-            const nomeFile = `articles/art${indice}.html`; 
+            const nomeFile = `/articles/art${indice}.html`; 
             
             try {
                 const response = await fetch(nomeFile);
