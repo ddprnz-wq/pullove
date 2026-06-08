@@ -11,7 +11,7 @@
 </head>
 <body>
 
-    <h1>Articoli trovati nella cartella /articles/:</h1>
+    <h1>Articoli trovati nella cartella articles/:</h1>
     <div id="lista-file-container">Caricamento in corso...</div>
 
     <script>
@@ -35,12 +35,12 @@
         let indice = 1;
         let continua = true;
         let fileTrovati = 0;
-        const LIMITE_MASSIMO = 100; 
+        const LIMITE_MASSIMO = 10; 
 
         while (continua && indice <= LIMITE_MASSIMO) {
             // Costruisce il percorso corretto verso la sottocartella articles
             const nomeFile = `art${indice}.html`;
-            const percorsoFile = `/articles/${nomeFile}`; 
+            const percorsoFile = `articles/${nomeFile}`; 
             
             try {
                 const response = await fetch(percorsoFile);
