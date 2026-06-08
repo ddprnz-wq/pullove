@@ -11,7 +11,7 @@
 </head>
 <body>
 
-    <h1>File trovati nella cartella:</h1>
+    <h1>Articoli trovati nella cartella /articles/:</h1>
     <div id="lista-file-container">Caricamento in corso...</div>
 
     <script>
@@ -21,57 +21,55 @@
         
         let lunghezzaIndex = 0;
         
-        // 1. SCARICA L'INDEX PER COSTRUIRE LA PROTEZIONE ANTI-LOOP
+        // 1. Scarica la index principale dal percorso assoluto per calcolare l'anti-loop
         try {
-            const resIndex = await fetch('index.html');
+            const resIndex = await fetch('/index.html');
             if (resIndex.ok) {
                 const testoIndex = await resIndex.text();
-                lunghezzaIndex = testoIndex.length; // Memorizza quanti caratteri ha la homepage
+                lunghezzaIndex = testoIndex.length;
             }
         } catch (e) {
-            console.log("Nessun file index.html trovato nella root.");
+            console.log("Impossibile verificare index.html");
         }
         
         let indice = 1;
         let continua = true;
         let fileTrovati = 0;
-        const LIMITE_MASSIMO = 10; // Sicurezza estrema
+        const LIMITE_MASSIMO = 100; 
 
         while (continua && indice <= LIMITE_MASSIMO) {
-            const nomeFile = `articles/art${indice}.html`; 
+            // Costruisce il percorso corretto verso la sottocartella articles
+            const nomeFile = `art${indice}.html`;
+            const percorsoFile = `/articles/${nomeFile}`; 
             
             try {
-                const response = await fetch(nomeFile);
+                const response = await fetch(percorsoFile);
                 
                 if (response.ok) {
                     const codiceHtml = await response.text();
 
-                    // 2. CONTROLLO ANTI-LOOP SU INDEX.HTML:
-                    // Se la lunghezza del file scaricato è identica a quella di index.html,
-                    // significa che il file reale è finito e il server ci sta imbrogliando.
+                    // CONTROLLO ANTI-LOOP DI CLOUDFLARE
                     if (codiceHtml.length === lunghezzaIndex) {
-                        console.log(`Rilevato reindirizzamento falso a index.html su: ${nomeFile}. Stop.`);
+                        console.log("Rilevato reindirzzamento falso alla homepage. Fine file.");
                         continua = false; 
                         break; 
                     }
 
                     fileTrovati++;
                     
-                    // Calcolo del peso in kB
                     const byteSize = new Blob([codiceHtml]).size;
                     const pesoKB = (byteSize / 1024).toFixed(2) + " kB";
                     
-                    // Estrazione del titolo dell'articolo
                     const parser = new DOMParser();
                     const documentoVirtuale = parser.parseFromString(codiceHtml, 'text/html');
                     const titoloFile = documentoVirtuale.querySelector('title')?.textContent || "Nessun titolo";
                     
-                    // Inserimento visivo nella pagina
                     const elemento = document.createElement('div');
                     elemento.className = 'file-item';
+                    // Nota: href punta a percorsoFile così i link si aprono correttamente
                     elemento.innerHTML = `
-                        <strong>File ${fileTrovati}:</strong> 
-                        <a href="${nomeFile}" target="_blank">${nomeFile}</a> 
+                        <strong>Articolo ${fileTrovati}:</strong> 
+                        <a href="${percorsoFile}" target="_blank">${nomeFile}</a> 
                         <span style="color: #28a745; margin-left: 10px; font-weight: bold;">(${pesoKB})</span>
                         <span style="color: #555; margin-left: 10px;">— Titolo: "<em>${titoloFile}</em>"</span>
                     `;
@@ -79,16 +77,16 @@
                     
                     indice++;
                 } else {
-                    continua = false; // Errore 404 standard
+                    continua = false; 
                 }
             } catch (errore) {
-                console.error("Errore di rete:", errore);
+                console.error("Errore:", errore);
                 continua = false;
             }
         }
 
         if (fileTrovati === 0) {
-            container.innerHTML = '<p class="error-msg">Nessun file trovato.</p>';
+            container.innerHTML = '<p class="error-msg">Nessun articolo trovato nella cartella /articles/.</p>';
         }
     }
 
