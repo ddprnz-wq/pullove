@@ -12,8 +12,6 @@ html<!DOCTYPE html>
 <body>
 
     <h1>File trovati nella cartella:</h1>
-    
-    <!-- Contenitore in cui verranno mostrati i file -->
     <div id="lista-file-container">Caricamento in corso...</div>
 
     <script>
@@ -21,12 +19,17 @@ html<!DOCTYPE html>
         const container = document.getElementById('lista-file-container');
         container.innerHTML = ''; 
         
+        // Memorizza la lunghezza esatta della pagina attuale per il confronto anti-loop
+        const testoPaginaCorrente = document.documentElement.outerHTML;
+        
         let indice = 1;
         let continua = true;
         let fileTrovati = 0;
+        
+        // Massima protezione: non andrà mai oltre i 100 file (puoi aumentare a 500 o 1000 se serve)
+        const LIMITE_MASSIMO = 100; 
 
-        while (continua) {
-            // Usa lo schema art1.html, art2.html come hai impostato tu
+        while (continua && indice <= LIMITE_MASSIMO) {
             const nomeFile = `art${indice}.html`; 
             
             try {
@@ -35,13 +38,21 @@ html<!DOCTYPE html>
                 if (response.ok) {
                     const codiceHtml = await response.text();
 
-                    // CONTROLLO DI SICUREZZA PER GITHUB / CLOUDFLARE PAGES:
-                    // Se il file scaricato contiene il titolo di questa pagina di scansione ("Lista File della Cartella Web"),
-                    // significa che il server sta imbrogliando e ci sta restituendo la pagina lista.html stessa.
-                    if (codiceHtml.includes('<title>Lista File della Cartella Web</title>')) {
-                        console.log("Rilevato reindirizzamento alla pagina della lista. Stop.");
+                    // 1. CONTROLLO DI SICUREZZA ANTI-LOOP DEFINITIVO:
+                    // Se il testo del file scaricato è identico a questa pagina, ferma tutto.
+                    if (codiceHtml === testoPaginaCorrente || codiceHtml.length === testoPaginaCorrente.length) {
+                        console.log("Rilevato reindirizzamento loop. Stop.");
                         continua = false; 
                         break; 
+                    }
+
+                    // 2. ULTERIORE CONTROLLO: Se il file non contiene la parola 'art', 
+                    // ma sei sicuro che i tuoi file veri la contengano nel testo, puoi usarlo come filtro.
+                    // Altrimenti controlliamo semplicemente se somiglia a un errore generico di GitHub (solitamente contiene 'github')
+                    if (codiceHtml.includes('not found') || codiceHtml.includes('404')) {
+                        console.log("Rilevato file di errore mascherato da 200 OK. Stop.");
+                        continua = false;
+                        break;
                     }
 
                     fileTrovati++;
@@ -50,13 +61,12 @@ html<!DOCTYPE html>
                     const byteSize = new Blob([codiceHtml]).size;
                     const pesoKB = (byteSize / 1024).toFixed(2) + " kB";
                     
-                    // Estrazione del titolo reale dell'articolo
+                    // Estrazione del titolo dell'articolo
                     const parser = new DOMParser();
                     const documentoVirtuale = parser.parseFromString(codiceHtml, 'text/html');
                     const titoloFile = documentoVirtuale.querySelector('title')?.textContent || "Nessun titolo";
                     
-                    // COSTRUTTORE GRAFICO (Mancava nel tuo codice):
-                    // Crea l'elemento visivo e lo appende nella pagina
+                    // Genera la riga nella pagina
                     const elemento = document.createElement('div');
                     elemento.className = 'file-item';
                     elemento.innerHTML = `
@@ -67,25 +77,22 @@ html<!DOCTYPE html>
                     `;
                     container.appendChild(elemento);
                     
-                    // Passa al file art successivo
                     indice++;
                 } else {
-                    // Se risponde con un vero errore 404, ferma il ciclo
+                    // Errore 404 reale (funziona sui server standard)
                     continua = false;
                 }
             } catch (errore) {
-                console.error("Errore di rete durante la lettura:", errore);
+                console.error("Errore di rete:", errore);
                 continua = false;
             }
         }
 
-        // Se non trova nessun file reale, mostra il messaggio di avviso
         if (fileTrovati === 0) {
             container.innerHTML = '<p class="error-msg">Nessun file trovato.</p>';
         }
     }
 
-    // Esegue la funzione
     mostraListaFile();
     </script>
 
