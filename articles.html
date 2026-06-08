@@ -360,7 +360,7 @@ fetch("https://api.github.com/repos/ddprnz-wq/pullove/contents/content/posts")
       <article style="margin-bottom:40px;padding:20px;border:1px solid #ccc;border-radius:10px;">
         <h2>${p.meta.title || "Untitled"}</h2>
         <small>${p.meta.date || ""}</small>
-        ${p.meta.thumbnail ? `<img src="${p.meta.thumbnail}" style="max-width:100%">` : ""}
+        ${p.meta.thumbnail ? `<img src="${p.meta.thumbnail}" style="width: 100px; max-width:100%">` : ""}
         <div>${marked.parse(p.content)}</div>
       </article>
     `).join("");
