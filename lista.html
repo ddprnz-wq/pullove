@@ -19,40 +19,52 @@
         const container = document.getElementById('lista-file-container');
         container.innerHTML = ''; 
         
+        let titoloHomepage = "";
+
+        // 1. SCARICA IL TITOLO DELLA HOMEPAGE PER PROTEZIONE
+        try {
+            const resIndex = await fetch('/index.html');
+            if (resIndex.ok) {
+                const htmlIndex = await resIndex.text();
+                const parserIndex = new DOMParser();
+                const docIndex = parserIndex.parseFromString(htmlIndex, 'text/html');
+                titoloHomepage = docIndex.querySelector('title')?.textContent || "";
+                console.log(`Titolo della homepage rilevato per blocco di sicurezza: "${titoloHomepage}"`);
+            }
+        } catch (e) {
+            console.log("Nessun file index.html accessibile nella root.");
+        }
+        
         let indice = 1;
         let continua = true;
         let fileTrovati = 0;
         
-        // IMPOSTATO A 10 COME RICHIESTO
-        const LIMITE_MASSIMO = 10; 
+        // Puoi rimettere il limite alto (es. 100), si fermerà da solo grazie al titolo
+        const LIMITE_MASSIMO = 100; 
 
         while (continua && indice <= LIMITE_MASSIMO) {
             const nomeFile = `art${indice}.html`;
             const percorsoFile = `/articles/${nomeFile}`; 
             
             try {
-                const response = await fetch(`${percorsoFile}?nocache=${Date.now()}`);
+                // Richiesta pulita senza parametri extra per non sovraccaricare le estensioni
+                const response = await fetch(percorsoFile);
                 
                 if (response.ok) {
                     const codiceHtml = await response.text();
-
-                    // Questo controllo ora cerca anche parole comuni di una pagina di errore standard (404)
-                    if (codiceHtml.includes('lista.html') || 
-                        codiceHtml.includes('id="lista-file-container"') || 
-                        codiceHtml.includes('404 Not Found') || 
-                        codiceHtml.includes('Page Not Found')) {
-                        console.log(`Rilevato file falso su ${nomeFile}. Stop ciclo.`);
-                        continua = false; 
-                        break; 
-                    }
-
-                    // ESTRAZIONE DEL TITOLO REALE
+                    
                     const parser = new DOMParser();
                     const documentoVirtuale = parser.parseFromString(codiceHtml, 'text/html');
                     const titoloFile = documentoVirtuale.querySelector('title')?.textContent || "Nessun titolo";
-                    
-                    // AIUTO PER IL DEBUG: Stampa nella console del browser il titolo che trova per ogni file
-                    console.log(`File: ${nomeFile} -> Titolo trovato: "${titoloFile}"`);
+
+                    // 2. CONTROLLO ANTI-LOOP SUL TITOLO:
+                    // Se il titolo del file scaricato corrisponde a quello della homepage, 
+                    // significa che il file artX.html non esiste e Cloudflare ci sta mostrando la home.
+                    if (titoloHomepage !== "" && titoloFile === titoloHomepage) {
+                        console.log(`Rilevata homepage su ${nomeFile} (Stesso titolo: "${titoloFile}"). Stop.`);
+                        continua = false; 
+                        break; 
+                    }
 
                     fileTrovati++;
                     
@@ -80,7 +92,7 @@
         }
 
         if (fileTrovati === 0) {
-            container.innerHTML = '<p class="error-msg">Nessun articolo trovato nella cartella /articles/.</p>';
+            container.innerHTML = '<p class="error-msg">Nessun articolo reale trovato nella cartella /articles/.</p>';
         }
     }
 
