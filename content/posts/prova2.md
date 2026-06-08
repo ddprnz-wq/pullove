@@ -6,4 +6,4 @@ thumbnail: ""
 Vediamo la prova 2. ***Provina*** provetta.
 
 
-<img src="/images/uploads/px-isabellamariana.jpg" alt="Immagine Responsive" style="width: 300px; height: auto;">
+<img src="/images/uploads/px-isabellamariana.jpg" alt="Immagine Responsive" width ="300">
