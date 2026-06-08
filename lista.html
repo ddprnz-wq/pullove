@@ -1,4 +1,4 @@
-html<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
@@ -19,15 +19,23 @@ html<!DOCTYPE html>
         const container = document.getElementById('lista-file-container');
         container.innerHTML = ''; 
         
-        // Memorizza la lunghezza esatta della pagina attuale per il confronto anti-loop
-        const testoPaginaCorrente = document.documentElement.outerHTML;
+        let lunghezzaIndex = 0;
+        
+        // 1. SCARICA L'INDEX PER COSTRUIRE LA PROTEZIONE ANTI-LOOP
+        try {
+            const resIndex = await fetch('index.html');
+            if (resIndex.ok) {
+                const testoIndex = await resIndex.text();
+                lunghezzaIndex = testoIndex.length; // Memorizza quanti caratteri ha la homepage
+            }
+        } catch (e) {
+            console.log("Nessun file index.html trovato nella root.");
+        }
         
         let indice = 1;
         let continua = true;
         let fileTrovati = 0;
-        
-        // Massima protezione: non andrà mai oltre i 100 file (puoi aumentare a 500 o 1000 se serve)
-        const LIMITE_MASSIMO = 10; 
+        const LIMITE_MASSIMO = 10; // Sicurezza estrema
 
         while (continua && indice <= LIMITE_MASSIMO) {
             const nomeFile = `art${indice}.html`; 
@@ -38,21 +46,13 @@ html<!DOCTYPE html>
                 if (response.ok) {
                     const codiceHtml = await response.text();
 
-                    // 1. CONTROLLO DI SICUREZZA ANTI-LOOP DEFINITIVO:
-                    // Se il testo del file scaricato è identico a questa pagina, ferma tutto.
-                    if (codiceHtml === testoPaginaCorrente || codiceHtml.length === testoPaginaCorrente.length) {
-                        console.log("Rilevato reindirizzamento loop. Stop.");
+                    // 2. CONTROLLO ANTI-LOOP SU INDEX.HTML:
+                    // Se la lunghezza del file scaricato è identica a quella di index.html,
+                    // significa che il file reale è finito e il server ci sta imbrogliando.
+                    if (codiceHtml.length === lunghezzaIndex) {
+                        console.log(`Rilevato reindirizzamento falso a index.html su: ${nomeFile}. Stop.`);
                         continua = false; 
                         break; 
-                    }
-
-                    // 2. ULTERIORE CONTROLLO: Se il file non contiene la parola 'art', 
-                    // ma sei sicuro che i tuoi file veri la contengano nel testo, puoi usarlo come filtro.
-                    // Altrimenti controlliamo semplicemente se somiglia a un errore generico di GitHub (solitamente contiene 'github')
-                    if (codiceHtml.includes('not found') || codiceHtml.includes('404')) {
-                        console.log("Rilevato file di errore mascherato da 200 OK. Stop.");
-                        continua = false;
-                        break;
                     }
 
                     fileTrovati++;
@@ -66,7 +66,7 @@ html<!DOCTYPE html>
                     const documentoVirtuale = parser.parseFromString(codiceHtml, 'text/html');
                     const titoloFile = documentoVirtuale.querySelector('title')?.textContent || "Nessun titolo";
                     
-                    // Genera la riga nella pagina
+                    // Inserimento visivo nella pagina
                     const elemento = document.createElement('div');
                     elemento.className = 'file-item';
                     elemento.innerHTML = `
@@ -79,8 +79,7 @@ html<!DOCTYPE html>
                     
                     indice++;
                 } else {
-                    // Errore 404 reale (funziona sui server standard)
-                    continua = false;
+                    continua = false; // Errore 404 standard
                 }
             } catch (errore) {
                 console.error("Errore di rete:", errore);
