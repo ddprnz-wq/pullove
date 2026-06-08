@@ -18,7 +18,7 @@ async function loadMeta(file) {
 }
 
 async function render() {
-  const list = document.getElementById("list");
+  const list = document.getElementById("lista");
 
   for (const f of files) {
     const data = await loadMeta(f);
