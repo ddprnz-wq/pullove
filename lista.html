@@ -22,41 +22,43 @@
         let indice = 1;
         let continua = true;
         let fileTrovati = 0;
-        const LIMITE_MASSIMO = 50; // Limite di sicurezza
+        
+        // IMPOSTATO A 10 COME RICHIESTO
+        const LIMITE_MASSIMO = 10; 
 
         while (continua && indice <= LIMITE_MASSIMO) {
-            // Percorso verso la sottocartella degli articoli
             const nomeFile = `art${indice}.html`;
             const percorsoFile = `/articles/${nomeFile}`; 
             
             try {
-                // Aggiungiamo un parametro casuale per bypassare la cache di Cloudflare (?nocache=...)
                 const response = await fetch(`${percorsoFile}?nocache=${Date.now()}`);
                 
                 if (response.ok) {
                     const codiceHtml = await response.text();
 
-                    // CONTROLLO DI SICUREZZA ANTI-LOOP BASATO SUL CONTENUTO:
-                    // Se Cloudflare ci rifila la homepage index.html di nascosto, questa conterrà sicuramente 
-                    // dei tag o degli id che l'articolo vero NON ha (es. il link a lista.html).
-                    if (codiceHtml.includes('lista.html') || codiceHtml.includes('id="lista-file-container"')) {
-                        console.log(`Trovato codice della homepage su ${nomeFile}. Stop ciclo.`);
+                    // Questo controllo ora cerca anche parole comuni di una pagina di errore standard (404)
+                    if (codiceHtml.includes('lista.html') || 
+                        codiceHtml.includes('id="lista-file-container"') || 
+                        codiceHtml.includes('404 Not Found') || 
+                        codiceHtml.includes('Page Not Found')) {
+                        console.log(`Rilevato file falso su ${nomeFile}. Stop ciclo.`);
                         continua = false; 
                         break; 
                     }
 
-                    fileTrovati++;
-                    
-                    // Calcolo del peso in kB
-                    const byteSize = new Blob([codiceHtml]).size;
-                    const pesoKB = (byteSize / 1024).toFixed(2) + " kB";
-                    
-                    // Estrazione del titolo dell'articolo
+                    // ESTRAZIONE DEL TITOLO REALE
                     const parser = new DOMParser();
                     const documentoVirtuale = parser.parseFromString(codiceHtml, 'text/html');
                     const titoloFile = documentoVirtuale.querySelector('title')?.textContent || "Nessun titolo";
                     
-                    // Genera la riga nella pagina lista.html
+                    // AIUTO PER IL DEBUG: Stampa nella console del browser il titolo che trova per ogni file
+                    console.log(`File: ${nomeFile} -> Titolo trovato: "${titoloFile}"`);
+
+                    fileTrovati++;
+                    
+                    const byteSize = new Blob([codiceHtml]).size;
+                    const pesoKB = (byteSize / 1024).toFixed(2) + " kB";
+                    
                     const elemento = document.createElement('div');
                     elemento.className = 'file-item';
                     elemento.innerHTML = `
@@ -78,7 +80,7 @@
         }
 
         if (fileTrovati === 0) {
-            container.innerHTML = '<p class="error-msg">Nessun articolo trovato nella cartella /articles/. Controlla che i file siano scritti in minuscolo (es. art1.html).</p>';
+            container.innerHTML = '<p class="error-msg">Nessun articolo trovato nella cartella /articles/.</p>';
         }
     }
 
