@@ -370,6 +370,52 @@ fetch("https://api.github.com/repos/ddprnz-wq/pullove/contents/content/posts")
                 <div id="lista"></div>
                 <script src="js/lista.js"></script>
             </div>
+        <div>
+            <script>
+                async function caricaTuttiIFile() {
+                    const listaFile = []; // Questo array conterrà tutti i tuoi file
+                    let indice = 1;
+                    let continua = true;
+
+                    while (continua) {
+                        // Costruisci il nome del file (es. file1.txt, file2.txt)
+                        const nomeFile = `art${indice}.html`; 
+                        
+                        try {
+                            // Tenta di scaricare il file dal server
+                            const response = await fetch(`articles/${nomeFile}`);
+                            
+                            if (response.ok) {
+                                const testo = await response.text();
+                                
+                                // Salva il risultato nell'array
+                                listaFile.push({
+                                    nome: nomeFile,
+                                    contenuto: testo
+                                });
+                                
+                                console.log(`Caricato con successo: ${nomeFile}`);
+                                indice++; // Passa al file successivo
+                            } else {
+                                // Se il server risponde con 404, i file sono finiti
+                                console.log(`Nessun altro file trovato. Stop a: ${nomeFile}`);
+                                continua = false;
+                            }
+                        } catch (error) {
+                            console.error("Errore di rete o server non raggiungibile:", error);
+                            continua = false;
+                        }
+                    }
+
+                    // Ora hai tutti i dati strutturati e pronti all'uso
+                    console.log("Tutti i file caricati:", listaFile);
+                    
+                    // Esempio per leggere il secondo file (corrisponde a file2.txt)
+                    // console.log(listaFile[1].contenuto);
+                }
+
+                caricaTuttiIFile();
+            </script>
         </div>
     </div>
 	<!-- Footer -->
