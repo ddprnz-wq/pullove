@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+html<!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
@@ -19,106 +19,75 @@
     <script>
     async function mostraListaFile() {
         const container = document.getElementById('lista-file-container');
-        container.innerHTML = ''; // Svuota il testo di caricamento
+        container.innerHTML = ''; 
         
         let indice = 1;
         let continua = true;
         let fileTrovati = 0;
 
-        // Ciclo sequenziale per cercare file1, file2, file3...
         while (continua) {
-            // Modifica l'estensione (.txt, .html, .jpg) in base alle tue necessità
+            // Usa lo schema art1.html, art2.html come hai impostato tu
             const nomeFile = `art${indice}.html`; 
             
             try {
-                // Esegue la richiesta web per verificare l'esistenza del file
                 const response = await fetch(nomeFile);
                 
                 if (response.ok) {
+                    const codiceHtml = await response.text();
+
+                    // CONTROLLO DI SICUREZZA PER GITHUB / CLOUDFLARE PAGES:
+                    // Se il file scaricato contiene il titolo di questa pagina di scansione ("Lista File della Cartella Web"),
+                    // significa che il server sta imbrogliando e ci sta restituendo la pagina lista.html stessa.
+                    if (codiceHtml.includes('<title>Lista File della Cartella Web</title>')) {
+                        console.log("Rilevato reindirizzamento alla pagina della lista. Stop.");
+                        continua = false; 
+                        break; 
+                    }
+
                     fileTrovati++;
                     
-                    // Crea un elemento HTML per mostrare il file nella lista
+                    // Calcolo del peso in kB
+                    const byteSize = new Blob([codiceHtml]).size;
+                    const pesoKB = (byteSize / 1024).toFixed(2) + " kB";
+                    
+                    // Estrazione del titolo reale dell'articolo
+                    const parser = new DOMParser();
+                    const documentoVirtuale = parser.parseFromString(codiceHtml, 'text/html');
+                    const titoloFile = documentoVirtuale.querySelector('title')?.textContent || "Nessun titolo";
+                    
+                    // COSTRUTTORE GRAFICO (Mancava nel tuo codice):
+                    // Crea l'elemento visivo e lo appende nella pagina
                     const elemento = document.createElement('div');
                     elemento.className = 'file-item';
-                    elemento.innerHTML = `<strong>File ${fileTrovati}:</strong> <a href="${nomeFile}" target="_blank">${nomeFile}</a>`;
-                    
-                    // Aggiunge l'elemento alla pagina
+                    elemento.innerHTML = `
+                        <strong>File ${fileTrovati}:</strong> 
+                        <a href="${nomeFile}" target="_blank">${nomeFile}</a> 
+                        <span style="color: #28a745; margin-left: 10px; font-weight: bold;">(${pesoKB})</span>
+                        <span style="color: #555; margin-left: 10px;">— Titolo: "<em>${titoloFile}</em>"</span>
+                    `;
                     container.appendChild(elemento);
                     
-                    indice++; // Passa al file successivo
+                    // Passa al file art successivo
+                    indice++;
                 } else {
-                    // Ferma il ciclo se riceve un errore (es. 404 File Not Found)
+                    // Se risponde con un vero errore 404, ferma il ciclo
                     continua = false;
                 }
             } catch (errore) {
-                console.error("Errore di rete:", errore);
+                console.error("Errore di rete durante la lettura:", errore);
                 continua = false;
             }
         }
 
-        // Se non viene trovato nemmeno il primo file
+        // Se non trova nessun file reale, mostra il messaggio di avviso
         if (fileTrovati === 0) {
-            container.innerHTML = '<p class="error-msg">Nessun file trovato con questo schema di nomi.</p>';
+            container.innerHTML = '<p class="error-msg">Nessun file trovato.</p>';
         }
     }
 
-    // Avvia la scansione all'apertura della pagina
-
-    //////////////////////////////////
-    
-    async function mostraListaFile2() {
-    const container = document.getElementById('lista-file-container');
-    container.innerHTML = ''; 
-    
-    let indice = 1;
-    let continua = true;
-    let fileTrovati = 0;
-
-    while (continua) {
-        const nomeFile = `art${indice}.html`; 
-        
-        try {
-            const response = await fetch(nomeFile);
-            
-            if (response.ok) {
-    const codiceHtml = await response.text();
-
-    // CONTROLLO DI SICUREZZA PER GITHUB/CLOUDFLARE:
-    // Se il server "imbroglia" e ti sta ridando la pagina index.html principale,
-    // significa che il file numerato reale è finito. 
-                if (codiceHtml.includes('id="lista-file-container"')) {
-                    console.log("Rilevato reindirizzamento alla pagina principale. Stop.");
-                    continua = false; 
-                    break; // Esce immediatamente dal ciclo while
-                }
-
-                fileTrovati++;
-                
-                // ... tutto il resto del tuo codice per DOMParser e pesoKB rimane identico ...
-                const byteSize = new Blob([codiceHtml]).size;
-                const pesoKB = (byteSize / 1024).toFixed(2) + " kB";
-                
-                const parser = new DOMParser();
-                const documentoVirtuale = parser.parseFromString(codiceHtml, 'text/html');
-                const titoloFile = documentoVirtuale.querySelector('title')?.textContent || "Nessun titolo";
-                
-                // ... inserimento nell'HTML ...
-                indice++;
-            } else {
-                continua = false;
-            }
-        } catch (errore) {
-            console.error("Errore di rete durante la lettura:", errore);
-            continua = false;
-        }
-    }
-
-    if (fileTrovati === 0) {
-        container.innerHTML = '<p class="error-msg">Nessun file trovato.</p>';
-    }
-}
-    mostraListaFile2();
+    // Esegue la funzione
+    mostraListaFile();
     </script>
-pippo
+
 </body>
 </html>
