@@ -22,8 +22,6 @@
         let indice = 1;
         let continua = true;
         let fileTrovati = 0;
-        
-        // Imposta questo limite al numero massimo di articoli che prevedi di avere (es. 50 o 100)
         const LIMITE_MASSIMO = 20; 
 
         while (continua && indice <= LIMITE_MASSIMO) {
@@ -35,29 +33,26 @@
                 
                 if (response.ok) {
                     const codiceHtml = await response.text();
-                    
-                    // CONTROLLO DI SICUREZZA ANTI-LOOP DEFINITIVO:
-                    // Se Cloudflare ti rimanda alla homepage 'index.html' o a 'lista.html', 
-                    // queste pagine contengono sicuramente la parola "lista-file-container".
-                    // Un articolo vero invece NON contiene questo ID. 
-                    if (codiceHtml.includes('lista-file-container')) {
-                        console.log(`Rilevato reindirizzamento falso su ${nomeFile}. Stop ciclo.`);
+
+                    // CONTROLLO DI SICUREZZA AGGIORNATO:
+                    // Cambia 'Articolo' con una parola che inserisci SEMPRE dentro i tuoi file art.html
+                    // Se il file scaricato NON contiene questa parola chiave, capiamo che Cloudflare 
+                    // ci sta rifilando la homepage al posto del file vero e blocchiamo il ciclo.
+                    if (!codiceHtml.includes('Articolo')) {
+                        console.log(`Il file ${nomeFile} non sembra un articolo valido. Stop ciclo.`);
                         continua = false; 
                         break; 
                     }
 
                     fileTrovati++;
                     
-                    // Calcolo del peso in kB
                     const byteSize = new Blob([codiceHtml]).size;
                     const pesoKB = (byteSize / 1024).toFixed(2) + " kB";
                     
-                    // Estrazione del titolo dell'articolo
                     const parser = new DOMParser();
                     const documentoVirtuale = parser.parseFromString(codiceHtml, 'text/html');
                     const titoloFile = documentoVirtuale.querySelector('title')?.textContent || "Nessun titolo";
                     
-                    // Genera la riga grafica nella pagina
                     const elemento = document.createElement('div');
                     elemento.className = 'file-item';
                     elemento.innerHTML = `
@@ -70,7 +65,6 @@
                     
                     indice++;
                 } else {
-                    // Se il server risponde con un 404 reale
                     continua = false; 
                 }
             } catch (errore) {
@@ -80,7 +74,7 @@
         }
 
         if (fileTrovati === 0) {
-            container.innerHTML = '<p class="error-msg">Nessun articolo trovato nella cartella /articles/. Verifica che i file si chiamino esattamente art1.html, art2.html ecc. e siano in minuscolo.</p>';
+            container.innerHTML = '<p class="error-msg">Nessun articolo trovato nella cartella /articles/.</p>';
         }
     }
 
